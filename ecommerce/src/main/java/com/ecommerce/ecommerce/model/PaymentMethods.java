@@ -1,9 +1,7 @@
 package com.ecommerce.ecommerce.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.ecommerce.ecommerce.roles.PaymentType;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Data
@@ -16,4 +14,10 @@ public class PaymentMethods {
     private Long id;
     private String details;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
+
+    @ManyToOne
+    @JoinColumn(name = "users_id")
+    private Users users;
 }

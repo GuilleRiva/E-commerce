@@ -1,9 +1,6 @@
 package com.ecommerce.ecommerce.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,4 +16,12 @@ public class Payments {
     private Long id;
     private BigDecimal amount;
     private LocalDateTime paymentDate;
+
+    @OneToOne
+    @JoinColumn(name = "orders_id")
+    private Orders orders;
+
+    @ManyToOne
+    @JoinColumn(name = "paymentMethods_id")
+    private PaymentMethods paymentMethods;
 }

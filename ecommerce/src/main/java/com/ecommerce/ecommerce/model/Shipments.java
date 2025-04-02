@@ -1,9 +1,7 @@
 package com.ecommerce.ecommerce.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.ecommerce.ecommerce.roles.ShippingStatus;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,5 +15,12 @@ public class Shipments {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime shippingDate;
+
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @Enumerated(EnumType.STRING)
+    private ShippingStatus shippingStatus;
 
 }

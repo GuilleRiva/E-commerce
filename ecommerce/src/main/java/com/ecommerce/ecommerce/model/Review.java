@@ -18,4 +18,12 @@ public class Review {
     private String comments;
     private LocalDateTime createdDate;
 
+    @ManyToOne
+    @JoinColumn(name = "users_id")
+    private Users users;
+
+    @ManyToOne
+    @JoinColumn(name = "products_id")
+    private Products products;
+
 }

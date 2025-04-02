@@ -1,9 +1,6 @@
 package com.ecommerce.ecommerce.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -18,4 +15,12 @@ public class OrderDetails {
     private Long id;
     private Integer amount;
     private BigDecimal unitPrice;
+
+    @ManyToOne
+    @JoinColumn(name = "orders_id")
+    private OrderDetails orderDetails;
+
+    @ManyToOne
+    @JoinColumn(name = "products_id")
+    private Products products;
 }

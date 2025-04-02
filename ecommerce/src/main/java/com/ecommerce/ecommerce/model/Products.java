@@ -1,12 +1,10 @@
 package com.ecommerce.ecommerce.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +18,20 @@ public class Products {
     private String description;
     private BigDecimal price;
     private Integer stock;
+
+    @ManyToOne
+    @JoinColumn(name = "categoryId")
+    private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "sellerId")
+    private Users SELLER;
+
+    @OneToMany(mappedBy = "products")
+    private List<OrderDetails>orderDetails;
+
+    @OneToMany(mappedBy = "products")
+    private List<Discounts>discounts;
 
 
 }

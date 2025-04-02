@@ -1,9 +1,6 @@
 package com.ecommerce.ecommerce.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -20,5 +17,9 @@ public class Discounts {
     private BigDecimal percent;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+
+    @ManyToOne
+    @JoinColumn(name = "products_id")
+    private Products products;
 
 }
