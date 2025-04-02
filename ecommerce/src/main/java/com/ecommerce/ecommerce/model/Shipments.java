@@ -20,6 +20,10 @@ public class Shipments {
     @JoinColumn(name = "address_id")
     private Address address;
 
+    @OneToOne
+    @JoinColumn(name = "orders_id")
+    private Orders orders;
+
     @Enumerated(EnumType.STRING)
     private ShippingStatus shippingStatus;
 

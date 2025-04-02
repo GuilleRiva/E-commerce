@@ -2,7 +2,6 @@ package com.ecommerce.ecommerce.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Data
@@ -18,7 +17,7 @@ public class OrderDetails {
 
     @ManyToOne
     @JoinColumn(name = "orders_id")
-    private OrderDetails orderDetails;
+    private Orders orders;
 
     @ManyToOne
     @JoinColumn(name = "products_id")
