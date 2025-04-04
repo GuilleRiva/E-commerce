@@ -3,6 +3,9 @@ package com.ecommerce.ecommerce.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,8 +20,10 @@ public class Cart {
     @JoinColumn(name = "user_id")
     private Users users;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Products products;
+    @ManyToMany
+    @JoinColumn(name = "cart_id")
+    private List<Products> products= new ArrayList<>();
+
+
 
 }

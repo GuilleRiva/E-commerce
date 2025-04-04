@@ -1,4 +1,4 @@
-package com.ecommerce.ecommerce.roles;
+package com.ecommerce.ecommerce.enums;
 
 public enum PaymentType {
     CREDIT,

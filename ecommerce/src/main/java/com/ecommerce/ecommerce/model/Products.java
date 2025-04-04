@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -33,5 +34,7 @@ public class Products {
     @OneToMany(mappedBy = "products")
     private List<Discounts>discounts;
 
+    @ManyToMany(mappedBy = "products")
+    private List<Cart>carts= new ArrayList<>();
 
 }

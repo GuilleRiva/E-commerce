@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.model;
 
+import com.ecommerce.ecommerce.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +18,9 @@ public class Payments {
     private BigDecimal amount;
     private LocalDateTime paymentDate;
 
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
     @OneToOne
     @JoinColumn(name = "orders_id")
     private Orders orders;
@@ -24,4 +28,6 @@ public class Payments {
     @ManyToOne
     @JoinColumn(name = "paymentMethods_id")
     private PaymentMethods paymentMethods;
+
+
 }

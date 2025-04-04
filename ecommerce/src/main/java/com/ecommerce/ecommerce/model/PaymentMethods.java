@@ -1,6 +1,6 @@
 package com.ecommerce.ecommerce.model;
 
-import com.ecommerce.ecommerce.roles.PaymentType;
+import com.ecommerce.ecommerce.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
 
