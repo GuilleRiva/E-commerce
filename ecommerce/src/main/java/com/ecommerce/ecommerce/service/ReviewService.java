@@ -17,15 +17,15 @@ public class ReviewService {
         this.reviewRepository = reviewRepository;
     }
 
-    private List<Review>getAll(){
+    public List<Review>getAll(){
         return reviewRepository.findAll();
     }
 
-    private List<Review>getProductId(Long productId){
+    public List<Review>getProductId(Long productId){
         return reviewRepository.findByProductId(productId);
     }
 
-    private Optional<Review>getById(Long id){
+    public Optional<Review>getById(Long id){
         return reviewRepository.findById(id);
     }
 
