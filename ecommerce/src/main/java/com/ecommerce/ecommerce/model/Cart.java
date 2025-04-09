@@ -21,9 +21,7 @@ public class Cart {
     private Users users;
 
     @ManyToMany
-    @JoinColumn(name = "cart_id")
+    @JoinTable(name = "cart_id")
     private List<Products> products= new ArrayList<>();
-
-
 
 }
