@@ -41,8 +41,8 @@ public class OrderDetailsService {
                 .orElseThrow(()-> new ResourceNotFoundException("product not found with ID:" + productId));
 
         OrderDetails orderDetails= new OrderDetails();
-        orderDetails.setOrders(orders);
-        orderDetails.setProducts(products);
+        orderDetails.setOrder(orders);
+        orderDetails.setProduct(products);
         orderDetails.setUnitPrice(products.getPrice());
 
         return orderDetailsRepository.save(orderDetails);

@@ -21,8 +21,8 @@ public class Shipments {
     private Address address;
 
     @OneToOne
-    @JoinColumn(name = "orders_id")
-    private Orders orders;
+    @JoinColumn(name = "order_id")
+    private Orders order;
 
     @Enumerated(EnumType.STRING)
     private ShippingStatus shippingStatus;

@@ -18,24 +18,24 @@ public class FavoriteService {
     }
 
     public List<Favorite>getByUserId(Long userId){
-        return favoriteRepository.findByUserId(userId);
+        return favoriteRepository.findByUser_Id(userId);
     }
 
     public boolean existsByUserAndProductId(Long userId, Long productId){
-        return favoriteRepository.existsByUserAndProduct(userId, productId);
+        return favoriteRepository.existsByUser_IdAndProduct_Id(userId, productId);
     }
 
     public Favorite addFavorite( Favorite favorite){
         if (existsByUserAndProductId(
-                favorite.getUsers().getId(),
-                favorite.getProducts().getId())){
+                favorite.getUser().getId(),
+                favorite.getProduct().getId())){
             throw new RuntimeException("This product is already marked as a favorite");
         }
         return favoriteRepository.save(favorite);
     }
 
     public void removeFavorite(Long userId, Long productId){
-        Optional<Favorite>favorite=favoriteRepository.findByUserIdAndProductId(userId, productId);
+        Optional<Favorite>favorite=favoriteRepository.findByUser_IdAndProduct_Id(userId, productId);
         favorite.ifPresent(favoriteRepository::delete);
     }
 

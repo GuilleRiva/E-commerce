@@ -19,7 +19,7 @@ public class Discounts {
     private LocalDateTime endDate;
 
     @ManyToOne
-    @JoinColumn(name = "products_id")
-    private Products products;
+    @JoinColumn(name = "product_id")
+    private Products product;
 
 }

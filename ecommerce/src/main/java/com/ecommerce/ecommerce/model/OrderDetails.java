@@ -16,10 +16,10 @@ public class OrderDetails {
     private BigDecimal unitPrice;
 
     @ManyToOne
-    @JoinColumn(name = "orders_id")
-    private Orders orders;
+    @JoinColumn(name = "order_id")
+    private Orders order;
 
     @ManyToOne
-    @JoinColumn(name = "products_id")
-    private Products products;
+    @JoinColumn(name = "product_id")
+    private Products product;
 }

@@ -19,19 +19,19 @@ public class Orders {
     private BigDecimal total;
 
     @ManyToOne
-    @JoinColumn(name = "users_id")
-    private Users users;
+    @JoinColumn(name = "user_id")
+    private Users user;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "orders")
+    @OneToMany(mappedBy = "order")
     private List<OrderDetails>orderDetails;
 
-    @OneToOne(mappedBy = "orders")
+    @OneToOne(mappedBy = "order")
     private Payments payments;
 
-    @OneToOne(mappedBy = "orders")
+    @OneToOne(mappedBy = "order")
     private Shipments shipments;
 
     @ManyToMany

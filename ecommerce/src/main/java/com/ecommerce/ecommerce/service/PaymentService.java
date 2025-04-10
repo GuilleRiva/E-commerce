@@ -47,7 +47,7 @@ public class PaymentService {
                 .orElseThrow(()-> new ResourceNotFoundException("Payment method not found with ID: " + methodId));
 
         Payments payments= new Payments();
-        payments.setOrders(orders);
+        payments.setOrder(orders);
         payments.setPaymentMethods(paymentMethods);
         payments.setAmount(amount);
         payments.setPaymentDate(LocalDateTime.now());

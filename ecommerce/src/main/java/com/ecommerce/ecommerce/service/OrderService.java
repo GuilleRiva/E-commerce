@@ -33,7 +33,7 @@ public class OrderService {
     }
 
     public List<Orders>getOrdersByUserId(Long userId){
-        return orderRepository.findByUserId(userId);
+        return orderRepository.findByUser_Id(userId);
     }
 
     public Orders updateOrderStatus(Long ordersId, String newStatus){

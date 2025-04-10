@@ -4,6 +4,7 @@ import com.ecommerce.ecommerce.enums.Rol;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -29,22 +30,22 @@ public class Users {
     @OneToMany(mappedBy = "SELLER")
     private List<Products> products;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Orders>orders;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<PaymentMethods>paymentMethods;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Address> addresses;
 
-    @OneToMany(mappedBy = "users")
-    private List<Favorite> favorites;
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorite> favorites= new ArrayList<>();
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Cart> carts;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Review> reviews;
 
 }

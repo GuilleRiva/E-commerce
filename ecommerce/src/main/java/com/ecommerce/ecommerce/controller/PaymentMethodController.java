@@ -1,6 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
-import com.ecommerce.ecommerce.repository.PaymentMethodsRepository;
+import com.ecommerce.ecommerce.model.PaymentMethods;
 import com.ecommerce.ecommerce.service.PaymentMethodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,12 @@ public class PaymentMethodController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PaymentMethodsRepository>> getAll(){
+    public ResponseEntity<List<PaymentMethods>> getAll(){
         return ResponseEntity.ok(paymentMethodService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PaymentMethodsRepository> getById(@PathVariable Long id){
+    public ResponseEntity<PaymentMethods> getById(@PathVariable Long id){
         return paymentMethodService.getById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

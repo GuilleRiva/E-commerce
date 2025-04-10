@@ -18,6 +18,6 @@ public class PaymentMethods {
     private PaymentType paymentType;
 
     @ManyToOne
-    @JoinColumn(name = "users_id")
-    private Users users;
+    @JoinColumn(name = "user_id")
+    private Users user;
 }

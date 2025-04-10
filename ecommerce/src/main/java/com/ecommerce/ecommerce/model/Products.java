@@ -28,13 +28,13 @@ public class Products {
     @JoinColumn(name = "sellerId")
     private Users SELLER;
 
-    @OneToMany(mappedBy = "products")
+    @OneToMany(mappedBy = "product")
     private List<OrderDetails>orderDetails;
 
-    @OneToMany(mappedBy = "products")
-    private List<Discounts>discounts;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Discounts>discounts= new ArrayList<>();
 
-    @ManyToMany(mappedBy = "products")
+    @ManyToMany(mappedBy = "product")
     private List<Cart>carts= new ArrayList<>();
 
 }

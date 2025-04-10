@@ -28,12 +28,12 @@ public class DiscountService {
 
     public List<Discounts>getDiscountActive(){
         LocalDateTime now= LocalDateTime.now();
-        return discountsRepository.findByDateEndBeforeAndDateEndAfter(now, now);
+        return discountsRepository.findByEndDateBeforeAndEndDateAfter(now, now);
     }
 
     public Optional<Discounts> getDiscountActiveByProduct(Long productId){
         LocalDateTime now= LocalDateTime.now();
-        return discountsRepository.findByProductIdAndDateInitBeforeAndDateAfter(productId, now, now);
+        return discountsRepository.findByProductIdAndStartDateBeforeAndEndDateAfter(productId, now, now);
     }
 
     public Discounts save(Discounts discounts){

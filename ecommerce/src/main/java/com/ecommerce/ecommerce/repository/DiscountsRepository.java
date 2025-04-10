@@ -13,7 +13,7 @@ public interface DiscountsRepository extends JpaRepository<Discounts, Long> {
 
         List<Discounts>findByProductId(Long productId);
 
-        List<Discounts>findByDateEndBeforeAndDateEndAfter(LocalDateTime dateInit, LocalDateTime dateEnd);
+        List<Discounts>findByEndDateBeforeAndEndDateAfter(LocalDateTime dateInit, LocalDateTime endDate);
 
-        Optional<Discounts> findByProductIdAndDateInitBeforeAndDateAfter(Long productId, LocalDateTime dateInit, LocalDateTime dateEnd);
+        Optional<Discounts> findByProductIdAndStartDateBeforeAndEndDateAfter(Long productId, LocalDateTime dateInit, LocalDateTime endDate);
 }

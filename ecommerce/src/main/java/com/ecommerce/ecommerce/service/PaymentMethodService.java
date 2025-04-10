@@ -17,11 +17,11 @@ public class PaymentMethodService {
         this.paymentMethodsRepository = paymentMethodsRepository;
     }
 
-    public List<PaymentMethodsRepository> getAll(){
+    public List<PaymentMethods> getAll(){
         return paymentMethodsRepository.findAll();
     }
 
-    public Optional<PaymentMethodsRepository> getById(Long id){
+    public Optional<PaymentMethods> getById(Long id){
         return paymentMethodsRepository.findById(id);
     }
 

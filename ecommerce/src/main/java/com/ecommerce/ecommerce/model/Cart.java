@@ -18,10 +18,10 @@ public class Cart {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Users users;
+    private Users user;
 
     @ManyToMany
     @JoinTable(name = "cart_id")
-    private List<Products> products= new ArrayList<>();
+    private List<Products> product= new ArrayList<>();
 
 }

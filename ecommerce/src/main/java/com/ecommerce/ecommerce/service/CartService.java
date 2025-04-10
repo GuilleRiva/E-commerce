@@ -25,23 +25,23 @@ public class CartService {
     }
 
     public Cart getCartByUserId(Long userId){
-        return cartRepository.findByUserId(userId)
+        return cartRepository.findByUser_Id(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("cart not found for user ID: " + userId));
     }
 
     public Cart addProductToCart(Long userId, Long productId){
-        Cart cart= cartRepository.findByUserId(userId)
+        Cart cart= cartRepository.findByUser_Id(userId)
                 .orElseGet(()-> {
                     Users users= userRepository.findById(userId)
                             .orElseThrow(()-> new ResourceNotFoundException("User not found with ID: " + userId));
                     Cart newCart= new Cart();
-                    newCart.setUsers(users);
+                    newCart.setUser(users);
                     return cartRepository.save(newCart);
                 });
 
         Products products= productsRepository.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product not found with ID: " + productId));
-        cart.getProducts().add(products);
+        cart.getProduct().add(products);
         return cartRepository.save(cart);
     }
 
@@ -49,7 +49,7 @@ public class CartService {
         Cart cart= getCartByUserId(userId);
         Products products= productsRepository.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product not found with ID: " + productId));
-        cart.getProducts().remove(products);
+        cart.getProduct().remove(products);
         return cartRepository.save(cart);
     }
 }
