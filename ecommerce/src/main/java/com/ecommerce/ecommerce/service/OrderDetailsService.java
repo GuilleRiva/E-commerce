@@ -34,20 +34,6 @@ public class OrderDetailsService {
                 .orElseThrow(()-> new ResourceNotFoundException("Details order not found eith ID: " + id));
     }
 
-    public OrderDetails addOrderDetail(Long orderId, Long productId, int quality){
-        Orders orders= orderRepository.findById(orderId)
-                .orElseThrow(()-> new ResourceNotFoundException("order not found with ID: "+ orderId));
-        Products products= productsRepository.findById(productId)
-                .orElseThrow(()-> new ResourceNotFoundException("product not found with ID:" + productId));
-
-        OrderDetails orderDetails= new OrderDetails();
-        orderDetails.setOrder(orders);
-        orderDetails.setProduct(products);
-        orderDetails.setUnitPrice(products.getPrice());
-
-        return orderDetailsRepository.save(orderDetails);
-    }
-
     public void deleteOrderDetail(Long id){
         if (!orderDetailsRepository.existsById(id)){
             throw new ResourceNotFoundException("Order details not found with ID: " + id);

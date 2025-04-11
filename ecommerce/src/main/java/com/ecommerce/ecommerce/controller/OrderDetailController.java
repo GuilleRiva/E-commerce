@@ -2,6 +2,11 @@ package com.ecommerce.ecommerce.controller;
 
 import com.ecommerce.ecommerce.model.OrderDetails;
 import com.ecommerce.ecommerce.service.OrderDetailsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/id/order-Details")
+@RequestMapping("/api/order-Details")
+@Tag(name = "order details", description = "endpoints for managing individual order items")
 public class OrderDetailController {
 
     private final OrderDetailsService orderDetailsService;
@@ -19,26 +25,41 @@ public class OrderDetailController {
         this.orderDetailsService = orderDetailsService;
     }
 
+
+
+    @Operation(summary = "List all order details", description =
+    "retrieves a list of all order details (individual purchase items)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "list order's detail successfully"),
+            @ApiResponse(responseCode = "400" , description = "invalid request or internal error retrieving order details")
+    })
     @GetMapping
     public ResponseEntity<List<OrderDetails>>getAllOrderDetails(){
         return ResponseEntity.ok(orderDetailsService.getAllOrderDetail());
     }
 
+
+
+    @Operation(summary = "get order detail by ID", description =
+    "retrieves a specified order detail by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "order details retrieves successfully"),
+            @ApiResponse(responseCode = "400", description = "couldn't be founded order's detail of purchase")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<OrderDetails>getOrderDetailById(@PathVariable Long id){
         return ResponseEntity.ok(orderDetailsService.getOrderDetailById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<OrderDetails> addOrderDetail(
-            @RequestParam Long orderId,
-            @RequestParam Long productId,
-            @RequestParam int quantity
-    ){
-        OrderDetails created= orderDetailsService.addOrderDetail(orderId, productId, quantity);
-        return ResponseEntity.ok(created);
-    }
 
+
+
+    @Operation(summary = "delete a order detail", description =
+    "delete a order detail by ID if the necessary")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "order detail deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "couldn't be deleted order detail by user ID")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deleteOrderDetail(@PathVariable Long id){
         orderDetailsService.deleteOrderDetail(id);

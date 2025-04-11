@@ -2,6 +2,11 @@ package com.ecommerce.ecommerce.controller;
 
 import com.ecommerce.ecommerce.model.Payments;
 import com.ecommerce.ecommerce.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/payment")
+@Tag(name = "Payments", description = "Endpoint to payments management")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -20,39 +26,102 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
+
+
+
+    @Operation(summary = "List all payments", description =
+    "List all payments made in the system")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "list payments successfully"),
+            @ApiResponse(responseCode = "400", description = "the list of payments don't available")
+    })
     @GetMapping
     public ResponseEntity<List<Payments>> getAllPayment(){
         return ResponseEntity.ok(paymentService.getAllPayments());
     }
 
+
+
+
+    @Operation(summary = "get payments by ID", description =
+    "Retrieves a specified payment by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "payments retrieves successfully"),
+            @ApiResponse(responseCode = "400", description = "couldn't found payment ID")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Payments>getPaymentById(@PathVariable Long id){
         return ResponseEntity.ok(paymentService.getPaymentById(id));
     }
 
-    @GetMapping("/{orderId}")
+
+
+
+    @Operation(
+            summary = "Get all payments for a specific order",
+            description = "Retrieves the list of payments associated with the given order ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Payments retrieves successfully"),
+            @ApiResponse(responseCode = "404", description = "Order not found or has no payments")
+    })
+    @GetMapping("/order/{orderId}")
     public ResponseEntity<List<Payments>>getPaymentsByOrderId(@PathVariable Long orderId){
         return ResponseEntity.ok(paymentService.getPaymentsByOrderId(orderId));
     }
 
+
+
+
+    @Operation(summary = "create a payment",description =
+    "Creates and registers a new payment for an existing order using the specified payment method")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Payment made successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid order ID, method ID or amount"),
+            @ApiResponse(responseCode = "404", description = "Order or payment method not found.")
+    })
     @PostMapping
     public ResponseEntity<Payments>createPayment(
+
+            @Parameter(description = "ID of the user to associate the payment with", required = true)
             @RequestParam Long orderId,
+
+            @Parameter(description = "ID of the payment method", required = true)
             @RequestParam Long methodId,
+
+            @Parameter(description = "Total amount of the payment to register", required = true)
             @RequestParam BigDecimal amount
             ){
         return ResponseEntity.ok(paymentService.createPayment(orderId, methodId, amount));
     }
 
+
+    @Operation(summary = "deleted a payment", description =
+    "delete a payment made by the customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204",description = "Payment deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Couldn't deleted the payment")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deletePayment(@PathVariable Long id){
             paymentService.deletePayment(id);
             return ResponseEntity.noContent().build();
     }
 
+
+    @Operation(summary = "Update status of payment", description =
+    "Retrieves updated status of the payments by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "status payment updated correctly"),
+            @ApiResponse(responseCode = "400", description = "Couldn't be updated the status payment")
+    })
     @PutMapping("/{id}/status")
     public ResponseEntity<Payments>updatePaymentStatus(
+
+            @Parameter(description = "ID of the payment status to check", required = true)
             @PathVariable Long id,
+
+            @Parameter(description = "Status of payment to check", required = true)
             @RequestParam String newStatus
     ){
         return ResponseEntity.ok(paymentService.updatePaymentStatus(id, newStatus));
