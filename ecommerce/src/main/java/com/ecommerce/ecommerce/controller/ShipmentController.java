@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XResponseDTO.ShipmentResponseDTO;
 import com.ecommerce.ecommerce.model.Shipments;
 import com.ecommerce.ecommerce.service.ShipmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +44,9 @@ public class ShipmentController {
             @ApiResponse(responseCode = "404", description = "Shipment not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Shipments> getById(@PathVariable Long id){
+    public ResponseEntity<ShipmentResponseDTO> getById(@PathVariable Long id){
         return shipmentService.getById(id)
+                .map(shipmentService::toShipmentResponseDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

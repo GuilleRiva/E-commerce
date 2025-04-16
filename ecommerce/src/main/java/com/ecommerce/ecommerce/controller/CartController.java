@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XResponseDTO.CartResponseDTO;
 import com.ecommerce.ecommerce.model.Cart;
 import com.ecommerce.ecommerce.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,9 +31,9 @@ public class CartController {
             @ApiResponse(responseCode = "200", description = "User cart found"),
             @ApiResponse(responseCode = "404", description = "user cart not found")
     })
-    @GetMapping("/{id}")
-    public ResponseEntity<Cart>getCartByUserId(@PathVariable Long id){
-        return ResponseEntity.ok(cartService.getCartByUserId(id));
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<CartResponseDTO> getCartByUserId(@PathVariable Long userId){
+        return ResponseEntity.ok(cartService.getCartByUserId(userId));
     }
 
 

@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XRequestDTO.ProductResponseDTO;
 import com.ecommerce.ecommerce.model.Products;
 import com.ecommerce.ecommerce.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +42,13 @@ public class ProductController {
     }
 
 
+    @GetMapping("/{id}")
+    public ResponseEntity<com.ecommerce.ecommerce.dto.XResponseDTO.ProductResponseDTO>getProductById(@PathVariable Long id){
+        Products products= productService.getProductById(id);
+        com.ecommerce.ecommerce.dto.XResponseDTO.ProductResponseDTO dto= productService.toProductResponseDTO(products);
+        return ResponseEntity.ok(dto);
+    }
+
 
     @Operation(summary = "get products by price range", description =
     "List products available for a requested range price")
@@ -67,8 +76,8 @@ public class ProductController {
             @ApiResponse(responseCode = "404")
     })
     @PostMapping
-    public ResponseEntity<Products>createProduct(@RequestBody Products products){
-        Products created= productService.saveProduct(products);
+    public ResponseEntity<Products>createProduct(@Valid @RequestBody ProductResponseDTO dto){
+        Products created= productService.saveProduct(dto);
         return ResponseEntity.ok(created);
     }
 

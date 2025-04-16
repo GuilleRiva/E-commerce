@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XResponseDTO.FavoriteResponseDTO;
 import com.ecommerce.ecommerce.model.Favorite;
 import com.ecommerce.ecommerce.service.FavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,11 +8,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/favorites")
@@ -32,8 +35,11 @@ public class FavoriteController {
             @ApiResponse(responseCode = "404", description = "User not found or has no favorites")
     })
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Favorite>>getFavoritesByUserId(@PathVariable Long userId){
-        return ResponseEntity.ok(favoriteService.getByUserId(userId));
+    public ResponseEntity<List<FavoriteResponseDTO>>getFavoritesByUserId(@PathVariable Long userId){
+        List<FavoriteResponseDTO> favorites = favoriteService.getByUserId(userId).stream()
+                .map(favoriteService::toFavoriteResponseDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(favorites);
     }
 
 
@@ -65,8 +71,11 @@ public class FavoriteController {
             @ApiResponse(responseCode = "400", description = "couldn't be add as favorite")
     })
     @PostMapping
-    public ResponseEntity<Favorite>addFavorite(@RequestBody Favorite favorite){
-        return ResponseEntity.ok(favoriteService.addFavorite(favorite));
+    public ResponseEntity<FavoriteResponseDTO>addFavorite(@Valid @RequestBody FavoriteResponseDTO dto){
+        Favorite favorite = favoriteService.toFavoriteEntity(dto);
+        Favorite saved = favoriteService.addFavorite(favorite);
+        FavoriteResponseDTO responseDTO = favoriteService.toFavoriteResponseDTO(saved);
+        return ResponseEntity.ok(responseDTO);
     }
 
 

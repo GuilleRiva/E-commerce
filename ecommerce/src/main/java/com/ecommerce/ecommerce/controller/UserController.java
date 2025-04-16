@@ -1,5 +1,7 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XRequestDTO.UserRequestDTO;
+import com.ecommerce.ecommerce.dto.XResponseDTO.UserResponseDTO;
 import com.ecommerce.ecommerce.model.Users;
 import com.ecommerce.ecommerce.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.geom.RectangularShape;
 import java.util.List;
 
 @RestController
@@ -35,8 +36,8 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid user data")
     })
     @PostMapping("/register")
-    public ResponseEntity<Users> registerUser(@RequestBody Users users){
-        Users created= userService.registerUsers(users);
+    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
+        UserResponseDTO created= userService.registerUsers(userRequestDTO);
         return ResponseEntity.ok(created);
     }
 

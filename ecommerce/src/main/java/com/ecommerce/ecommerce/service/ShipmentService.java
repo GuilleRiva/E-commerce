@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.service;
 
+import com.ecommerce.ecommerce.dto.XResponseDTO.ShipmentResponseDTO;
 import com.ecommerce.ecommerce.enums.ShippingStatus;
 import com.ecommerce.ecommerce.model.Shipments;
 import com.ecommerce.ecommerce.repository.ShipmentRepository;
@@ -25,6 +26,16 @@ public class ShipmentService {
 
     public Optional<Shipments>getById(Long id){
         return shipmentRepository.findById(id);
+    }
+
+
+    public ShipmentResponseDTO toShipmentResponseDTO( Shipments shipments){
+        return new ShipmentResponseDTO(
+                shipments.getId(),
+                shipments.getTrackingCode(),
+                shipments.getShippingStatus(),
+                shipments.getOrder()
+        );
     }
 
     public Optional<Shipments>getByOrderId(Long orderId){

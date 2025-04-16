@@ -1,11 +1,14 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XRequestDTO.DiscountRequestDTO;
+import com.ecommerce.ecommerce.dto.XResponseDTO.DiscountResponseDTO;
 import com.ecommerce.ecommerce.model.Discounts;
 import com.ecommerce.ecommerce.service.DiscountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -84,8 +87,11 @@ public class DiscountController {
             @ApiResponse(responseCode = "404", description = "couldn't be saved the new discounts in the store")
     })
     @PostMapping
-    public ResponseEntity<Discounts>saveDiscount(@RequestBody Discounts discounts){
-        return ResponseEntity.ok(discountService.save(discounts));
+    public ResponseEntity<DiscountResponseDTO>saveDiscount(@Valid @RequestBody DiscountRequestDTO dto){
+        Discounts entity = discountService.toDiscountEntity(dto);
+        Discounts saved = discountService.save(entity);
+        DiscountResponseDTO responseDTO = discountService.toDiscountResponseDTO(saved);
+        return ResponseEntity.ok(responseDTO);
     }
 
 

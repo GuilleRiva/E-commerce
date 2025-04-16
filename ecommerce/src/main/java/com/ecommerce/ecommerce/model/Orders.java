@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,6 +19,7 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal total;
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -26,7 +29,7 @@ public class Orders {
     private OrderStatus orderStatus;
 
     @OneToMany(mappedBy = "order")
-    private List<OrderDetails>orderDetails;
+    private List<OrderDetails>orderDetails = new ArrayList<>();
 
     @OneToOne(mappedBy = "order")
     private Payments payments;

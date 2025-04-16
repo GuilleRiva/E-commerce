@@ -1,4 +1,5 @@
 package com.ecommerce.ecommerce.service;
+import com.ecommerce.ecommerce.dto.XRequestDTO.PaymentRequestDTO;
 import com.ecommerce.ecommerce.enums.OrderStatus;
 import com.ecommerce.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.ecommerce.model.Orders;
@@ -39,6 +40,24 @@ public class PaymentService {
     public List<Payments>getPaymentsByOrderId(Long orderId){
         return paymentsRepository.findByOrderId(orderId);
     }
+
+
+    public Payments toPaymentEntity(PaymentRequestDTO dto){
+        Orders orders = orderRepository.findById(dto.getOrderId())
+                .orElseThrow(()-> new ResourceNotFoundException("Order not found with ID" + dto.getOrderId()));
+
+        PaymentMethods methods = paymentMethodsRepository.findById(dto.getPaymentMethod())
+                .orElseThrow(()-> new ResourceNotFoundException("Payment method not found with ID" + dto.getPaymentMethod()));
+
+        Payments payments = new Payments();
+        payments.setOrder(orders);
+        payments.setPaymentMethods(methods);
+        payments.setAmount(dto.getAmount());
+        payments.setOrderStatus(OrderStatus.SENT);
+        payments.setPaymentDate(LocalDateTime.now());
+        return payments;
+    }
+
 
     public Payments createPayment(Long orderId, Long methodId, BigDecimal amount){
         Orders orders=orderRepository.findById(orderId)

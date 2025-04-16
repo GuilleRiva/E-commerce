@@ -1,5 +1,7 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XRequestDTO.OrderRequestDTO;
+import com.ecommerce.ecommerce.dto.XResponseDTO.OrderResponseDTO;
 import com.ecommerce.ecommerce.model.Orders;
 import com.ecommerce.ecommerce.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +33,8 @@ public class OrderController {
     @Operation(summary = "create a new order", description =
     "Creates a new purchase order from the current user's cart and selected options ")
     @PostMapping
-    public ResponseEntity<Orders>createOrder(@RequestBody Orders orders){
-        Orders created= orderService.createOrder(orders);
+    public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO dto){
+        OrderResponseDTO created= orderService.createOrder(dto);
         return ResponseEntity.ok(created);
     }
 

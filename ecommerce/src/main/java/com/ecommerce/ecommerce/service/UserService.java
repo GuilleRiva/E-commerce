@@ -1,5 +1,7 @@
 package com.ecommerce.ecommerce.service;
 
+import com.ecommerce.ecommerce.dto.XRequestDTO.UserRequestDTO;
+import com.ecommerce.ecommerce.dto.XResponseDTO.UserResponseDTO;
 import com.ecommerce.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.ecommerce.model.Users;
 import com.ecommerce.ecommerce.repository.UserRepository;
@@ -18,11 +20,19 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Users registerUsers(Users newUser){
-        if (userRepository.existsByEmail(newUser.getEmail())){
-            throw new IllegalArgumentException("The email is no longer in use");
-        }
-        return userRepository.save(newUser);
+    public UserResponseDTO registerUsers(UserRequestDTO dto){
+        Users user= new Users();
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPass(dto.getPassword());
+
+        Users savedUser= userRepository.save(user);
+
+        return new UserResponseDTO(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail()
+        );
     }
 
     public Users findByEmail(String email){

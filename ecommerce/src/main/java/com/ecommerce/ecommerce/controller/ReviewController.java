@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.controller;
 
+import com.ecommerce.ecommerce.dto.XResponseDTO.ReviewResponseDTO;
 import com.ecommerce.ecommerce.model.Review;
 import com.ecommerce.ecommerce.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +28,7 @@ public class ReviewController {
     @Operation(summary = "List all reviews", description =
     "List all reviews available in the system")
     @GetMapping
-    public ResponseEntity<List<Review>>getAllReviews(){
+    public ResponseEntity<List<ReviewResponseDTO>> getAllReviews(){
         return ResponseEntity.ok(reviewService.getAll());
     }
 

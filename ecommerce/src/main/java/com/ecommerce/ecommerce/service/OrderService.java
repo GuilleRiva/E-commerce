@@ -1,17 +1,20 @@
 package com.ecommerce.ecommerce.service;
 
+import com.ecommerce.ecommerce.dto.XRequestDTO.OrderDetailRequestDTO;
+import com.ecommerce.ecommerce.dto.XResponseDTO.OrderItemDTO;
+import com.ecommerce.ecommerce.dto.XRequestDTO.OrderRequestDTO;
+import com.ecommerce.ecommerce.dto.XResponseDTO.OrderResponseDTO;
 import com.ecommerce.ecommerce.exception.BusinessException;
 import com.ecommerce.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.ecommerce.model.*;
-import com.ecommerce.ecommerce.repository.CartRepository;
-import com.ecommerce.ecommerce.repository.OrderDetailsRepository;
-import com.ecommerce.ecommerce.repository.OrderRepository;
+import com.ecommerce.ecommerce.repository.*;
 import com.ecommerce.ecommerce.enums.OrderStatus;
-import com.ecommerce.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -20,19 +23,81 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final OrderDetailsRepository orderDetailsRepository;
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
+    private final PaymentMethodsRepository paymentMethodsRepository;
+    private final ProductsRepository productsRepository;
 
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, CartRepository cartRepository, OrderDetailsRepository orderDetailsRepository, UserRepository userRepository) {
+    public OrderService(OrderRepository orderRepository, CartRepository cartRepository, OrderDetailsRepository orderDetailsRepository, UserRepository userRepository, AddressRepository addressRepository, PaymentMethodsRepository paymentMethodsRepository, ProductsRepository productsRepository) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
         this.orderDetailsRepository = orderDetailsRepository;
         this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
+        this.paymentMethodsRepository = paymentMethodsRepository;
+        this.productsRepository = productsRepository;
+    }
+
+    public OrderResponseDTO toOrderResponseDTO(Orders order){
+        OrderResponseDTO dto = new OrderResponseDTO();
+        dto.setOrderId(order.getId());
+        dto.setStatus(String.valueOf(order.getOrderStatus()));
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setTotal(order.getTotal());
+
+        //Convert order details
+        List<OrderItemDTO> items = order.getOrderDetails().stream()
+                .map(orderDetails -> new OrderItemDTO(
+                        orderDetails.getProduct().getName(),
+                        orderDetails.getAmount(),
+                        orderDetails.getUnitPrice()
+                ))
+                .collect(Collectors.toList());
+
+        dto.setItems(items);
+
+        return dto;
     }
 
 
-    public Orders createOrder(Orders orders){
-        return orderRepository.save(orders);
+    public OrderResponseDTO createOrder(OrderRequestDTO dto){
+        Users users= userRepository.findById(dto.getUserId())
+                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+
+        Address address= addressRepository.findById(dto.getAddressId())
+                .orElseThrow(()-> new ResourceNotFoundException("Address not found"));
+
+        PaymentMethods paymentMethods= paymentMethodsRepository.findById(dto.getPaymentMethodId())
+                .orElseThrow(()-> new ResourceNotFoundException("Payment method not found"));
+
+
+        //creates order
+        Orders order= new Orders();
+        order.setUser(users);
+
+        Orders savedOrder= orderRepository.save(order);
+
+        //creates and save details
+        List<OrderDetails>detailsList= new ArrayList<>();
+        for (OrderDetailRequestDTO item : dto.getOrderDetail()){
+            Products products = productsRepository.findById(item.getProductId())
+                    .orElseThrow(()-> new ResourceNotFoundException("Product not found"));
+
+            OrderDetails details= new OrderDetails();
+            details.setOrder(savedOrder);
+            details.setProduct(products);
+            details.setAmount(item.getQuantity());
+            details.setUnitPrice(products.getPrice());
+
+            detailsList.add(details);
+
+            orderDetailsRepository.saveAll(detailsList);
+            savedOrder.setOrderDetails(detailsList);
+
+        }
+
+        return toOrderResponseDTO(savedOrder);
     }
 
 
