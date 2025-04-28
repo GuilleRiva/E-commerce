@@ -26,7 +26,7 @@ public class ReviewService {
     }
 
 
-    public ReviewResponseDTO toReviewResponseDTO(Review review){
+   public ReviewResponseDTO toReviewResponseDTO(Review review){
         return new ReviewResponseDTO(
                 review.getId(),
                 review.getUser().getUsername(),

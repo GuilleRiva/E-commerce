@@ -38,6 +38,12 @@ public class Orders {
     private Shipments shipments;
 
     @ManyToMany
-    private List<Products>products;
+    @JoinTable(
+            name = "orders_products",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name =
+            "product_id")
+    )
+    private List<Products>products= new ArrayList<>();
 
 }
