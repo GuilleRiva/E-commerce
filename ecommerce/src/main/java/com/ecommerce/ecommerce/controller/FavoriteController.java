@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "200", description = "Favorites retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "User not found or has no favorites")
     })
+    @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<FavoriteResponseDTO>>getFavoritesByUserId(@PathVariable Long userId){
         List<FavoriteResponseDTO> favorites = favoriteService.getByUserId(userId).stream()
@@ -51,6 +53,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "400", description = "Invalid userId or productID"),
             @ApiResponse(responseCode = "404", description = "User or product not found")
     })
+    @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean>existsByUserAndProduct(
             @Parameter(description = "ID of the user to check", required = true)
@@ -70,6 +73,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "200",description = "product add as favorite successfully"),
             @ApiResponse(responseCode = "400", description = "couldn't be add as favorite")
     })
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<FavoriteResponseDTO>addFavorite(@Valid @RequestBody FavoriteResponseDTO dto){
         Favorite favorite = favoriteService.toFavoriteEntity(dto);
@@ -87,6 +91,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "204", description = "product remove as favorite successfully"),
             @ApiResponse(responseCode = "404", description = "couldn't be removed the product marked as favorite")
     })
+    @PreAuthorize("hasRole('CUSTOMER')")
     @DeleteMapping
     public ResponseEntity<Void>removeFavorite(
             @Parameter(description = "ID of the user check", required = true)

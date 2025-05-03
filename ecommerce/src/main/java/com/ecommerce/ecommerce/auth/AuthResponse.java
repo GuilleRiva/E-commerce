@@ -1,11 +1,18 @@
 package com.ecommerce.ecommerce.auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
-@Data
-@AllArgsConstructor
+@Schema(description = "Authentication response" +
+        "containing JWT token")
+@Getter
 public class AuthResponse {
-    private String token;
+    @Schema(description = "JWT token", example =
+    "eyHjbpoOiuhasmkasldjj...")
+    private final String token;
+
+    public AuthResponse(String token){
+        this.token= token;
+    }
 
 }

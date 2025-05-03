@@ -6,9 +6,11 @@ import com.ecommerce.ecommerce.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/reviews")
 @Tag(name = "reviews", description = "Endpoints for managing customer reviews in the store")
+@SecurityRequirement(name = "bearerAuth")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -27,6 +30,7 @@ public class ReviewController {
 
     @Operation(summary = "List all reviews", description =
     "List all reviews available in the system")
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping
     public ResponseEntity<List<ReviewResponseDTO>> getAllReviews(){
         return ResponseEntity.ok(reviewService.getAll());
@@ -39,6 +43,7 @@ public class ReviewController {
             @ApiResponse(responseCode = "200",description = "Retrieves review successfully"),
             @ApiResponse(responseCode = "404", description = "Review not found")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/{id}")
     public ResponseEntity<Review>getReviewById(@PathVariable Long id){
         return reviewService.getById(id)
@@ -54,6 +59,7 @@ public class ReviewController {
             @ApiResponse(responseCode = "400", description = "Invalid review data"),
             @ApiResponse(responseCode = "404", description = "Product or user not found")
     })
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<Review>createReview(@RequestBody Review review){
         return ResponseEntity.ok(reviewService.save(review));

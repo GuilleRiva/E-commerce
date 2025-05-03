@@ -7,10 +7,12 @@ import com.ecommerce.ecommerce.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "Users", description = "Endpoints for user registration, retrieval and management")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService userService;
@@ -49,6 +52,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "User with the given email not found")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/email/{email}")
     public ResponseEntity<Users>getUsersByEmail(@PathVariable String email){
         Users users= userService.findByEmail(email);
@@ -65,6 +69,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/username/{username}")
     public ResponseEntity<Users>getUserByUsername(@PathVariable String username){
         Users users= userService.findByUsername(username);
@@ -96,6 +101,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<Users>>getAllUsers(){
         return ResponseEntity.ok(userService.getAllUsers());
@@ -110,6 +116,7 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deleteUser(@PathVariable Long id){
         userService.deleteUser(id);

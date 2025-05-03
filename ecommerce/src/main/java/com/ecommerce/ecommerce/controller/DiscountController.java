@@ -7,11 +7,13 @@ import com.ecommerce.ecommerce.service.DiscountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/discounts")
 @Tag(name = "discounts", description = "endpoints to discounts management")
+@SecurityRequirement(name = "bearerAuth")
 public class DiscountController {
 
     private final DiscountService discountService;
@@ -31,6 +34,7 @@ public class DiscountController {
 
     @Operation(summary = "get all discounts", description =
     "will list all discounts available in the store")
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping
     public ResponseEntity<List<Discounts>>getAllDiscounts(){
         return ResponseEntity.ok(discountService.getAll());
@@ -43,6 +47,7 @@ public class DiscountController {
             @ApiResponse(responseCode = "200", description = "discounts found successfully"),
             @ApiResponse(responseCode = "404", description = "id discounts not found")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping("/{id}")
     public ResponseEntity<Discounts>getDiscountById(@PathVariable Long id){
         return discountService.getById(id)
@@ -57,6 +62,7 @@ public class DiscountController {
             @ApiResponse(responseCode = "200", description = "discounts active available"),
             @ApiResponse(responseCode = "404", description = "couldn't found discounts active")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping("/active")
     public ResponseEntity<List<Discounts>>getActiveDiscounts(){
         return ResponseEntity.ok(discountService.getDiscountActive());
@@ -70,6 +76,7 @@ public class DiscountController {
             @ApiResponse(responseCode = "200", description = "Active discount for the product found"),
             @ApiResponse(responseCode = "404", description = "No active discount for the product")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping("/product/{productId}/active")
     public ResponseEntity<Discounts>getActiveDiscountByProduct(@PathVariable Long productId){
         return discountService.getDiscountActiveByProduct(productId)
@@ -86,6 +93,7 @@ public class DiscountController {
             @ApiResponse(responseCode = "200", description = "discounts saved successfully"),
             @ApiResponse(responseCode = "404", description = "couldn't be saved the new discounts in the store")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @PostMapping
     public ResponseEntity<DiscountResponseDTO>saveDiscount(@Valid @RequestBody DiscountRequestDTO dto){
         Discounts entity = discountService.toDiscountEntity(dto);
@@ -102,6 +110,7 @@ public class DiscountController {
             @ApiResponse(responseCode = "204",description = "discounts deleted successfully"),
             @ApiResponse(responseCode = "400", description = "couldn't be deleted this discounts")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deleteDiscount(@PathVariable Long id){
         discountService.delete(id);

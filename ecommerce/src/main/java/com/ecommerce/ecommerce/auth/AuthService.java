@@ -3,12 +3,15 @@ package com.ecommerce.ecommerce.auth;
 import com.ecommerce.ecommerce.model.Users;
 import com.ecommerce.ecommerce.repository.UserRepository;
 import com.ecommerce.ecommerce.security.JwtService;
+import com.ecommerce.ecommerce.security.UserDetailsImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -22,7 +25,7 @@ public class AuthService {
     }
 
     public AuthResponse login (AuthRequest request){
-        try {
+
 
             //1. Autentica el usuario con su username y password
 
@@ -34,17 +37,10 @@ public class AuthService {
 
             //2. Si pasa,recupera el usuario desde la base de datos.
 
-            Users user = userRepository.findByUsername(request.getUsername())
-                    .orElseThrow(()-> new RuntimeException("User not found"));
+            UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
 
             //3. Genera un token JWT para ese usuario.
-            String jwtToken = jwtService.generateToken((UserDetails) user);
-
-
-            //4. Devuelve el token como respuesta.
-            return new AuthResponse(jwtToken);
-        } catch (AuthenticationException e){
-            throw new RuntimeException("Invalid username or password");
-        }
+            String token = jwtService.generateToken(userDetails);
+            return new AuthResponse(token);
     }
 }

@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -17,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/payment")
 @Tag(name = "Payments", description = "Endpoint to payments management")
+@SecurityRequirement(name = "bearerAuth")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -35,6 +38,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "list payments successfully"),
             @ApiResponse(responseCode = "400", description = "the list of payments don't available")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<Payments>> getAllPayment(){
         return ResponseEntity.ok(paymentService.getAllPayments());
@@ -49,6 +53,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "payments retrieves successfully"),
             @ApiResponse(responseCode = "400", description = "couldn't found payment ID")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/{id}")
     public ResponseEntity<Payments>getPaymentById(@PathVariable Long id){
         return ResponseEntity.ok(paymentService.getPaymentById(id));
@@ -65,6 +70,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "Payments retrieves successfully"),
             @ApiResponse(responseCode = "404", description = "Order not found or has no payments")
     })
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/order/{orderId}")
     public ResponseEntity<List<Payments>>getPaymentsByOrderId(@PathVariable Long orderId){
         return ResponseEntity.ok(paymentService.getPaymentsByOrderId(orderId));
@@ -80,6 +86,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "400", description = "Invalid order ID, method ID or amount"),
             @ApiResponse(responseCode = "404", description = "Order or payment method not found.")
     })
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<Payments>createPayment(
 
@@ -102,6 +109,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "204",description = "Payment deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Couldn't deleted the payment")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deletePayment(@PathVariable Long id){
             paymentService.deletePayment(id);
@@ -115,6 +123,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "status payment updated correctly"),
             @ApiResponse(responseCode = "400", description = "Couldn't be updated the status payment")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @PutMapping("/{id}/status")
     public ResponseEntity<Payments>updatePaymentStatus(
 

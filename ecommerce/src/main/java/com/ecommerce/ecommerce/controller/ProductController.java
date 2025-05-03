@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -19,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 @Tag(name= "Products", description ="Endpoints for product management")
+@SecurityRequirement(name = "bearerAuth")
 public class ProductController {
 
     private final ProductService productService;
@@ -36,12 +39,14 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description =
             "List of products getting successfully")
     })
+    @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping
     public ResponseEntity<List<Products>>getAllProducts(){
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
 
+    @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/{id}")
     public ResponseEntity<com.ecommerce.ecommerce.dto.XResponseDTO.ProductResponseDTO>getProductById(@PathVariable Long id){
         Products products= productService.getProductById(id);
@@ -55,6 +60,7 @@ public class ProductController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "List of products by range price")
     })
+    @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/price-range")
     public ResponseEntity<List<Products>>getProductsByPriceRange(
             @Parameter(description = "minimum price filter ")
@@ -75,6 +81,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403"),
             @ApiResponse(responseCode = "404")
     })
+    @PreAuthorize("hasROLE('ADMIN')")
     @PostMapping
     public ResponseEntity<Products>createProduct(@Valid @RequestBody ProductResponseDTO dto){
         Products created= productService.saveProduct(dto);
@@ -91,6 +98,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "Access denied- unauthorized role"),
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @PutMapping("/{id}")
     public ResponseEntity<Products>updateProduct(
             @PathVariable Long id,
@@ -108,6 +116,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description =
             "delete products by id")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deleteProducts(@PathVariable Long id){
         productService.deleteProduct(id);

@@ -49,7 +49,7 @@ public class PasswordHashGenerator {
                 "Passerini9",
                 "FrancoJara29",
                 "Marchesin25",
-                "LeandroBrey12",
+                "LeanBrey12",
                 "Advincula17",
                 "ChapuLema2",
                 "NicoFigal4",

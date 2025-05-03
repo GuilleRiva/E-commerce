@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/categories")
 @Tag(name = "category", description = "endpoints for categories management")
+@SecurityRequirement(name = "bearerAuth")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -31,6 +34,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "200", description =
             "List of categories getting successfully")
     })
+    @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping
     public ResponseEntity<List<Category>>getAllCategories(){
         return ResponseEntity.ok(categoryService.getAllCategories());
@@ -43,6 +47,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "200", description = "category founded"),
             @ApiResponse(responseCode = "404", description = "category not found")
     })
+    @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/{id}")
     public ResponseEntity<Category>getCategoryById(@PathVariable Long id){
         Category category= categoryService.getCategoryById(id);
@@ -59,6 +64,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "403", description = "access denied- unauthorized role"),
             @ApiResponse(responseCode = "404", description = " category couldn't be created")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @PostMapping
     public ResponseEntity<Category>createCategory(@RequestBody Category category){
         Category created = categoryService.createCategory(category);
@@ -74,6 +80,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "403", description = "access denied- unauthorized role"),
             @ApiResponse(responseCode = "404", description = "category couldn't be updated")
     })
+    @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @PutMapping("/{id}")
     public ResponseEntity<Category>updatedCategory(
             @Parameter(description = "Category ID to updated")
@@ -92,6 +99,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "403", description = "Access denied- unauthorized role"),
             @ApiResponse(responseCode = "404", description = "category not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deleteCategory(@PathVariable Long id){
         categoryService.deleteCategory(id);
