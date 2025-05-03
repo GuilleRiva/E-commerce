@@ -1,8 +1,12 @@
 package com.ecommerce.ecommerce.auth;
 
+import com.ecommerce.ecommerce.dto.XRequestDTO.RefreshTokenRequest;
+import com.ecommerce.ecommerce.dto.XResponseDTO.RefreshTokenResponse;
+import com.ecommerce.ecommerce.model.RefreshToken;
 import com.ecommerce.ecommerce.model.Users;
 import com.ecommerce.ecommerce.repository.UserRepository;
 import com.ecommerce.ecommerce.security.JwtService;
+import com.ecommerce.ecommerce.security.RefreshTokenService;
 import com.ecommerce.ecommerce.security.UserDetailsImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,15 +21,16 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService) {
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, RefreshTokenService refreshTokenService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public AuthResponse login (AuthRequest request){
-
 
             //1. Autentica el usuario con su username y password
 
@@ -35,12 +40,29 @@ public class AuthService {
                                     request.getPassword())
                     );
 
-            //2. Si pasa,recupera el usuario desde la base de datos.
+            Users user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(()-> new RuntimeException("User not found"));
 
-            UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
+            String accessToken = jwtService.generateToken((UserDetails) user);
+            String refreshToken = jwtService.generateToken((UserDetails) user);
 
-            //3. Genera un token JWT para ese usuario.
-            String token = jwtService.generateToken(userDetails);
-            return new AuthResponse(token);
+            user.setRefreshToken(refreshToken);
+            userRepository.save(user);
+
+            return new AuthResponse(accessToken, refreshToken);
+    }
+
+    public RefreshTokenResponse refreshTokenResponse(RefreshTokenRequest request){
+        String requestToken = request.getRefreshTokenRequest();
+
+        RefreshToken refreshToken = refreshTokenService.findByToken(requestToken)
+                .orElseThrow(()-> new RuntimeException("Refresh token not found"));
+
+        refreshTokenService.verifyToken(refreshToken);
+
+        Users user = refreshToken.getUser();
+        String accessToken = jwtService.generateToken(new UserDetailsImpl(user));
+
+        return new RefreshTokenResponse(accessToken, requestToken, "Bearer");
     }
 }

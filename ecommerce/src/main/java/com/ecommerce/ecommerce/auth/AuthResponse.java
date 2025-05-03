@@ -11,7 +11,7 @@ public class AuthResponse {
     "eyHjbpoOiuhasmkasldjj...")
     private final String token;
 
-    public AuthResponse(String token){
+    public AuthResponse(String token, String refreshToken){
         this.token= token;
     }
 

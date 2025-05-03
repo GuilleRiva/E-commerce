@@ -21,6 +21,9 @@ public class Users {
     private String email;
     private String pass;
 
+    @Column(length = 500)
+    private String refreshToken;
+
     @Getter
     @Setter
     @Enumerated(EnumType.STRING)
