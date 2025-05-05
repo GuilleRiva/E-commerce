@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 public class RefreshTokenService {
 
-    @Value("${jwt.refresh.expiration}")
+  /*  @Value("${jwt.refresh.expiration}")*/
     private Long refreshTokenDurationMs;
 
     private final RefreshTokenRepository refreshTokenRepository;
@@ -34,13 +34,13 @@ public class RefreshTokenService {
         refreshToken.setUser(user);
         refreshToken.setToken(UUID.randomUUID().toString());
 
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        refreshToken.setExpiry_date(Instant.now().plusMillis(refreshTokenDurationMs));
 
         return refreshTokenRepository.save(refreshToken);
     }
 
     public RefreshToken verifyToken (RefreshToken token){
-        if (token.getExpiryDate().isBefore(Instant.now())){
+        if (token.getExpiry_date().isBefore(Instant.now())){
             refreshTokenRepository.delete(token);
             throw new RuntimeException("Runtime token has expired. Please sign in again.");
         }

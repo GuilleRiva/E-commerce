@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-@Entity
+@Entity(name = "refresh_token")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,5 +25,5 @@ public class RefreshToken {
     private String token;
 
     @Column(nullable = false)
-    private Instant expiryDate;
+    private Instant expiry_date;
 }

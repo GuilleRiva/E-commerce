@@ -4,6 +4,7 @@ import com.ecommerce.ecommerce.dto.XRequestDTO.RefreshTokenRequest;
 import com.ecommerce.ecommerce.dto.XResponseDTO.RefreshTokenResponse;
 import com.ecommerce.ecommerce.model.RefreshToken;
 import com.ecommerce.ecommerce.model.Users;
+import com.ecommerce.ecommerce.repository.RefreshTokenRepository;
 import com.ecommerce.ecommerce.repository.UserRepository;
 import com.ecommerce.ecommerce.security.JwtService;
 import com.ecommerce.ecommerce.security.RefreshTokenService;
@@ -15,6 +16,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 @Service
 public class AuthService {
 
@@ -22,12 +26,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, RefreshTokenService refreshTokenService) {
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     public AuthResponse login (AuthRequest request){
@@ -46,8 +52,12 @@ public class AuthService {
             String accessToken = jwtService.generateToken((UserDetails) user);
             String refreshToken = jwtService.generateToken((UserDetails) user);
 
-            user.setRefreshToken(refreshToken);
-            userRepository.save(user);
+            RefreshToken token = new RefreshToken();
+            token.setUser(user);
+            token.setToken(refreshToken);
+            token.setExpiry_date(Instant.now().plus(7, ChronoUnit.DAYS));
+
+            refreshTokenRepository.save(token);
 
             return new AuthResponse(accessToken, refreshToken);
     }

@@ -21,8 +21,6 @@ public class Users {
     private String email;
     private String pass;
 
-    @Column(length = 500)
-    private String refreshToken;
 
     @Getter
     @Setter
@@ -50,5 +48,9 @@ public class Users {
 
     @OneToMany(mappedBy = "user")
     private List<Review> reviews;
+
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refresh_token;
+
 
 }
