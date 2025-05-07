@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/payment")
 @Tag(name = "Payments", description = "Endpoint to payments management")
@@ -31,7 +35,6 @@ public class PaymentController {
 
 
 
-
     @Operation(summary = "List all payments", description =
     "List all payments made in the system")
     @ApiResponses(value = {
@@ -41,7 +44,14 @@ public class PaymentController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<Payments>> getAllPayment(){
-        return ResponseEntity.ok(paymentService.getAllPayments());
+
+        log.info("Request to fetch all payments");
+
+        List<Payments> payments = paymentService.getAllPayments();
+
+        log.info("Retrieved {} payments", payments.size());
+
+        return ResponseEntity.ok(payments);
     }
 
 
@@ -56,6 +66,14 @@ public class PaymentController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/{id}")
     public ResponseEntity<Payments>getPaymentById(@PathVariable Long id){
+
+        log.info("Fetching payments with ID: {}", id);
+
+        Payments payments = paymentService.getPaymentById(id);
+
+        log.info("Retrieved payments ID={}, Amount={}",
+                payments.getId(), payments.getAmount());
+
         return ResponseEntity.ok(paymentService.getPaymentById(id));
     }
 
@@ -73,7 +91,14 @@ public class PaymentController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/order/{orderId}")
     public ResponseEntity<List<Payments>>getPaymentsByOrderId(@PathVariable Long orderId){
-        return ResponseEntity.ok(paymentService.getPaymentsByOrderId(orderId));
+
+        log.info("Fetching payments for order ID:{}", orderId);
+
+        List<Payments>payments = paymentService.getPaymentsByOrderId(orderId);
+
+        log.info("Found {} payments for order ID {}", payments.size(), orderId);
+
+        return ResponseEntity.ok(payments);
     }
 
 
@@ -99,8 +124,17 @@ public class PaymentController {
             @Parameter(description = "Total amount of the payment to register", required = true)
             @RequestParam BigDecimal amount
             ){
-        return ResponseEntity.ok(paymentService.createPayment(orderId, methodId, amount));
+        log.info("Creating payment for order ID: {}, method ID: {}, amount> {}",
+                orderId,methodId,amount);
+
+        Payments payments = paymentService.createPayment(orderId, methodId, amount);
+
+        log.info("Payment created: ID={}, OrderID={}, Amount={}",
+                payments.getId(), payments.getOrder(), payments.getAmount());
+
+        return ResponseEntity.ok(payments);
     }
+
 
 
     @Operation(summary = "deleted a payment", description =
@@ -112,7 +146,13 @@ public class PaymentController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deletePayment(@PathVariable Long id){
+
+        log.info("Deleting payment with ID: {}", id);
+
             paymentService.deletePayment(id);
+
+            log.info("Payment with ID {} deleted successfully", id);
+
             return ResponseEntity.noContent().build();
     }
 
@@ -133,7 +173,13 @@ public class PaymentController {
             @Parameter(description = "Status of payment to check", required = true)
             @RequestParam String newStatus
     ){
-        return ResponseEntity.ok(paymentService.updatePaymentStatus(id, newStatus));
+        log.info("Updating payment status for ID {} to {}", id, newStatus);
+
+        Payments updated = paymentService.updatePaymentStatus(id, newStatus);
+
+        log.info("Updated payment status: ID={}, NewStatus={}", id, updated.getOrderStatus());
+
+        return ResponseEntity.ok(updated);
     }
 
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/payments-methods")
 @Tag(name = "payment methods ", description = "Endpoints for managing available payment methods")
@@ -32,6 +34,8 @@ public class PaymentMethodController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping
     public ResponseEntity<List<PaymentMethods>> getAll(){
+
+        log.info("Request retrieved to fetch all payment methods");
         return ResponseEntity.ok(paymentMethodService.getAll());
     }
 
@@ -45,9 +49,20 @@ public class PaymentMethodController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/{id}")
     public ResponseEntity<PaymentMethods> getById(@PathVariable Long id){
+
+        log.info("Request received to get payment method with ID: {}", id);
+
         return paymentMethodService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(paymentMethods -> {
+
+                    log.info("Payment method found: ID={}, type={}", paymentMethods.getId(), paymentMethods.getPaymentType());
+                    return ResponseEntity.ok(paymentMethods);
+                })
+                .orElseGet(()-> {
+
+                    log.warn("Payment method with ID {} not found", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
 
@@ -76,7 +91,11 @@ public class PaymentMethodController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>delete(@PathVariable Long id){
+
+        log.info("Attempting to delete payment method with ID:{}", id);
         paymentMethodService.delete(id);
+
+        log.info("Payment method with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
     }
 }

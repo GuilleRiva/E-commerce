@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/cart")
 @Tag(name = "cart", description = "endpoints for cart management")
@@ -34,10 +36,16 @@ public class CartController {
             @ApiResponse(responseCode = "200", description = "User cart found"),
             @ApiResponse(responseCode = "404", description = "user cart not found")
     })
+
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<CartResponseDTO> getCartByUserId(@PathVariable Long userId){
-        return ResponseEntity.ok(cartService.getCartByUserId(userId));
+
+        log.info("Fetching cart for user ID: {}", userId);
+        CartResponseDTO cart = cartService.getCartByUserId(userId);
+
+        log.info("Cart retrieved with {} products for user ID: {}", cart.getCartId(), userId);
+        return ResponseEntity.ok(cart);
     }
 
 
@@ -48,9 +56,11 @@ public class CartController {
             @ApiResponse(responseCode = "200", description = "add product to cart successfully"),
             @ApiResponse(responseCode = "404", description = "the product couldn't no be add to the cart")
     })
+
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/{userId}/add")
     public ResponseEntity<Cart>addProductToCart(
+
             @PathVariable Long userId,
             @PathVariable Long productId
     ){
@@ -64,6 +74,7 @@ public class CartController {
             @ApiResponse(responseCode = "200", description = "product successfully removed from cart "),
             @ApiResponse(responseCode = "404",description = "the product couldn't be removed to the cart")
     })
+
     @PreAuthorize("hasRole('CUSTOMER')")
     @DeleteMapping("/{userId}/remove")
     public ResponseEntity<Cart>removeProductFromCart(

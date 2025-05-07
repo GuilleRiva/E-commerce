@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/reviews")
 @Tag(name = "reviews", description = "Endpoints for managing customer reviews in the store")
@@ -33,6 +35,8 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping
     public ResponseEntity<List<ReviewResponseDTO>> getAllReviews(){
+
+        log.info("Request retrieves to fetch all reviews");
         return ResponseEntity.ok(reviewService.getAll());
     }
 
@@ -46,9 +50,19 @@ public class ReviewController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/{id}")
     public ResponseEntity<Review>getReviewById(@PathVariable Long id){
+        log.info("Request to retrieve review with ID: {}", id);
+
         return reviewService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(review -> {
+
+                    log.info("Review found with ID: {}", review.getId());
+                    return ResponseEntity.ok(review);
+                })
+                .orElseGet(()-> {
+
+                    log.warn("No review found with ID: {}", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
 
@@ -62,7 +76,13 @@ public class ReviewController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<Review>createReview(@RequestBody Review review){
-        return ResponseEntity.ok(reviewService.save(review));
+
+        log.info("Attempting to create review for product ID:{}, by user ID: {}",
+                review.getProduct().getId() , review.getUser().getId());
+
+        Review saved = reviewService.save(review);
+        log.info("Review created successfully with ID: {}", saved.getId());
+        return ResponseEntity.ok(saved);
     }
 
 }

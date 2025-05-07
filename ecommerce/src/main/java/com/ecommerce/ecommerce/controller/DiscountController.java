@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.apache.tomcat.util.buf.UEncoder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/discounts")
 @Tag(name = "discounts", description = "endpoints to discounts management")
@@ -37,6 +38,13 @@ public class DiscountController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping
     public ResponseEntity<List<Discounts>>getAllDiscounts(){
+
+        log.info("Request retrieved to fetch all discounts");
+
+        List<Discounts> discounts = discountService.getAll();
+
+        log.info("Retrieved {} discounts ", discounts.size());
+
         return ResponseEntity.ok(discountService.getAll());
     }
 
@@ -50,9 +58,22 @@ public class DiscountController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping("/{id}")
     public ResponseEntity<Discounts>getDiscountById(@PathVariable Long id){
+
+        log.info("Request received to fetch discount with ID: {}", id);
+
         return discountService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(discounts -> {
+
+                    log.info("Discount found: ID={}, Percent={}%", discounts.getId(), discounts.getPercent());
+
+                    return ResponseEntity.ok(discounts);
+                })
+                .orElseGet(()-> {
+
+                    log.warn("Discount with ID {} not found", id);
+
+                    return ResponseEntity.notFound().build();
+                });
     }
 
 
@@ -65,7 +86,14 @@ public class DiscountController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping("/active")
     public ResponseEntity<List<Discounts>>getActiveDiscounts(){
-        return ResponseEntity.ok(discountService.getDiscountActive());
+
+        log.info("Request received to fetch all active discounts");
+
+        List<Discounts> activeDiscounts = discountService.getDiscountActive();
+
+        log.info("Total active discount found: {}", activeDiscounts.size());
+
+        return ResponseEntity.ok(activeDiscounts);
     }
 
 
@@ -79,9 +107,23 @@ public class DiscountController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping("/product/{productId}/active")
     public ResponseEntity<Discounts>getActiveDiscountByProduct(@PathVariable Long productId){
+
+        log.info("Request to fetch active discount for product ID:", productId);
+
         return discountService.getDiscountActiveByProduct(productId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(discounts -> {
+
+                    log.info("Active discount found for product ID {}: Discount ID={}, Percent={}%",
+                            productId, discounts.getId(), discounts.getPercent());
+
+                    return ResponseEntity.ok(discounts);
+                })
+                .orElseGet(()-> {
+
+                    log.warn("No active discount found for product ID: {}", productId);
+
+                    return ResponseEntity.notFound().build();
+                });
     }
 
 
@@ -96,9 +138,15 @@ public class DiscountController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @PostMapping
     public ResponseEntity<DiscountResponseDTO>saveDiscount(@Valid @RequestBody DiscountRequestDTO dto){
+
+        log.info("Request to save a new discount: ProductID={}, Percent={}, StartDate={},EndDate={}",
+                dto.getProductId(),dto.getPercent(),dto.getStartDate(), dto.getEndDate());
+
         Discounts entity = discountService.toDiscountEntity(dto);
         Discounts saved = discountService.save(entity);
         DiscountResponseDTO responseDTO = discountService.toDiscountResponseDTO(saved);
+
+        log.info("Discount saved successfully with ID: {}", saved.getId());
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -113,7 +161,13 @@ public class DiscountController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deleteDiscount(@PathVariable Long id){
+
+        log.info("Request to delete discount with ID: {}", id);
+
         discountService.delete(id);
+
+        log.info("Discount with ID {} deleted successfully", id);
+
         return ResponseEntity.noContent().build();
     }
 }

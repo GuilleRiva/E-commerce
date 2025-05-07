@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/favorites")
 @Tag(name = "favorites", description = "Endpoints to favorite management")
@@ -35,6 +37,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "200", description = "Favorites retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "User not found or has no favorites")
     })
+
     @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<FavoriteResponseDTO>>getFavoritesByUserId(@PathVariable Long userId){
@@ -53,15 +56,21 @@ public class FavoriteController {
             @ApiResponse(responseCode = "400", description = "Invalid userId or productID"),
             @ApiResponse(responseCode = "404", description = "User or product not found")
     })
+
     @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean>existsByUserAndProduct(
+
             @Parameter(description = "ID of the user to check", required = true)
             @RequestParam Long userId,
             @Parameter(description = "ID of the product to check", required = true)
             @RequestParam Long productId
     ){
+
+        log.info("Checking if user ID {} has product ID {} as favorite ", userId, productId);
         boolean exists= favoriteService.existsByUserAndProductId(userId, productId);
+
+        log.info("Result:{}", exists ? "Favorite exists": "Favorite does not exist");
         return ResponseEntity.ok(exists);
     }
 
@@ -73,6 +82,7 @@ public class FavoriteController {
             @ApiResponse(responseCode = "200",description = "product add as favorite successfully"),
             @ApiResponse(responseCode = "400", description = "couldn't be add as favorite")
     })
+
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<FavoriteResponseDTO>addFavorite(@Valid @RequestBody FavoriteResponseDTO dto){
@@ -91,15 +101,20 @@ public class FavoriteController {
             @ApiResponse(responseCode = "204", description = "product remove as favorite successfully"),
             @ApiResponse(responseCode = "404", description = "couldn't be removed the product marked as favorite")
     })
+
     @PreAuthorize("hasRole('CUSTOMER')")
     @DeleteMapping
     public ResponseEntity<Void>removeFavorite(
+
             @Parameter(description = "ID of the user check", required = true)
             @RequestParam Long userId,
             @Parameter(description = "ID of the product product", required = true)
             @RequestParam Long productId
     ){
+        log.info("Attempting to remove product with ID:{}, from favorite", productId);
         favoriteService.removeFavorite(userId, productId);
+
+        log.info("product with ID {} removed successfully from favorite ", productId);
         return ResponseEntity.noContent().build();
     }
 }

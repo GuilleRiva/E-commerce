@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/shipments")
 @Tag(name = "Shipments", description = "Endpoints for managing order shipments")
@@ -34,6 +36,8 @@ public class ShipmentController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping
     public ResponseEntity<List<Shipments>>getAllShipments(){
+
+        log.info("Request retrieves to fetch all shipments");
         return ResponseEntity.ok(shipmentService.getAll());
     }
 
@@ -64,9 +68,19 @@ public class ShipmentController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER, CUSTOMER')")
     @GetMapping("/order/{orderId}")
     public ResponseEntity<Shipments>getShipmentsByOrderId(@PathVariable Long orderId){
+        log.info("Request to retrieve shipment with ID: {}",orderId);
+
         return shipmentService.getByOrderId(orderId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(shipments -> {
+
+                    log.info("Shipments found with ID: {}", shipments.getOrder().getId());
+                    return ResponseEntity.ok(shipments);
+                })
+                .orElseGet(()-> {
+
+                    log.warn("No shipments found with ID: {}", orderId);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
 
@@ -82,7 +96,11 @@ public class ShipmentController {
             @PathVariable Long id,
             @RequestParam String newStatus
     ){
-        return ResponseEntity.ok(shipmentService.updateStatus(id, newStatus));
+        log.info("Attempting to update shipment with ID: {}", id);
+        Shipments update = shipmentService.updateStatus(id, newStatus);
+
+        log.info("Shipment with ID {} updated successfully ", id);
+        return ResponseEntity.ok(update);
     }
 
 
@@ -95,7 +113,11 @@ public class ShipmentController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>deleteShipment(@PathVariable Long id){
+
+        log.info("Attempting to delete shipment with ID: {}", id);
         shipmentService.delete(id);
+
+        log.info("Shipment with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
     }
 }

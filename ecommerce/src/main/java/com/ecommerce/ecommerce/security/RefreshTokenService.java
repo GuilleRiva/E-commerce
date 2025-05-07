@@ -4,14 +4,14 @@ import com.ecommerce.ecommerce.model.RefreshToken;
 import com.ecommerce.ecommerce.model.Users;
 import com.ecommerce.ecommerce.repository.RefreshTokenRepository;
 import com.ecommerce.ecommerce.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class RefreshTokenService {
 
@@ -26,17 +26,22 @@ public class RefreshTokenService {
         this.userRepository = userRepository;
     }
 
-    public RefreshToken createRefreshToken( Long userId){
-        Users user = userRepository.findById(userId)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with id: " + userId));
+    public RefreshToken createRefreshToken( Users userId){
+        log.info("Creating new refresh token user: {}",
+                userId.getUsername());
 
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(user);
+        refreshToken.setUser(userId);
         refreshToken.setToken(UUID.randomUUID().toString());
 
         refreshToken.setExpiry_date(Instant.now().plusMillis(refreshTokenDurationMs));
 
-        return refreshTokenRepository.save(refreshToken);
+        RefreshToken savedToken = refreshTokenRepository.save(refreshToken);
+
+        log.debug("Refresh token saved with ID: {} for user: {}",
+                savedToken.getId(), userId.getUsername());
+
+        return savedToken;
     }
 
     public RefreshToken verifyToken (RefreshToken token){
@@ -48,10 +53,13 @@ public class RefreshTokenService {
     }
 
     public Optional<RefreshToken> findByToken(String token){
+        log.info("Searching for refresh token: {}", token);
         return refreshTokenRepository.findByToken(token);
     }
 
-    public void deleteByUserId (Long userId){
-        refreshTokenRepository.deleteByUserId(userId);
+    public void deleteByUserId (Users userId){
+        log.info("Deleting refresh tokens for user:{}",
+                userId.getUsername());
+        refreshTokenRepository.deleteByUserId(userId.getId());
     }
 }
