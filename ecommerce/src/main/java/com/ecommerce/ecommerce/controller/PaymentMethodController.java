@@ -78,6 +78,11 @@ public class PaymentMethodController {
     @PreAuthorize("hasAnyRole('ADMIN, SELLER')")
     @GetMapping("/{id}/exists")
     public ResponseEntity<Boolean>existsById(@PathVariable Long id){
+
+        log.info("Received request to check existence of payment method with ID: {}", id);
+        boolean exists = paymentMethodService.existsById(id);
+
+        log.info("Payment method with ID {} exists: {}",id, exists);
         return ResponseEntity.ok(paymentMethodService.existsById(id));
     }
 

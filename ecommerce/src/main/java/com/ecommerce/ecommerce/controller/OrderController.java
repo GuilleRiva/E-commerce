@@ -42,7 +42,12 @@ public class OrderController {
     "Creates a new purchase order from the current user's cart and selected options ")
     @PostMapping
     public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO dto){
+
+        log.info("Received request to create order: UserId={}, OrderDetail={}, PaymentMehodId={}",
+                dto.getUserId(), dto.getOrderDetail(), dto.getPaymentMethodId());
         OrderResponseDTO created= orderService.createOrder(dto);
+
+        log.info("Order created successfully with ID: {}", created.getOrderId());
         return ResponseEntity.ok(created);
     }
 

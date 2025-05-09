@@ -64,6 +64,10 @@ public class CartController {
             @PathVariable Long userId,
             @PathVariable Long productId
     ){
+        log.info("Request received to add product(ID: {}) to cart of user (ID: {})", productId, userId);
+        Cart updatedCart = cartService.addProductToCart(userId, productId);
+
+        log.info("Product (ID: {}) added to user (ID: {}) cart successfully", productId, userId);
         return ResponseEntity.ok(cartService.addProductToCart(userId, productId));
     }
 
@@ -81,6 +85,10 @@ public class CartController {
             @PathVariable Long userId,
             @PathVariable Long productId
     ){
+        log.info("Request received to remove product (ID: {}) from cart of user (ID: {})", productId, userId);
+        Cart updatedCart= cartService.removeProductFromCart(userId, productId);
+
+        log.info("Product (ID:{}) removed from user (ID: {}) cart successfully", productId,userId);
         return ResponseEntity.ok(cartService.removeProductFromCart(userId, productId));
     }
 }

@@ -41,9 +41,13 @@ public class FavoriteController {
     @PreAuthorize("hasAnyRole('CUSTOMER, ADMIN, SELLER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<FavoriteResponseDTO>>getFavoritesByUserId(@PathVariable Long userId){
+        log.info("Fetching favorites for user with ID: {}", userId);
+
         List<FavoriteResponseDTO> favorites = favoriteService.getByUserId(userId).stream()
                 .map(favoriteService::toFavoriteResponseDTO)
                 .collect(Collectors.toList());
+
+        log.info("Found {} favorite(s) for user with ID: {}", favorites.size(),userId);
         return ResponseEntity.ok(favorites);
     }
 
@@ -86,9 +90,13 @@ public class FavoriteController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<FavoriteResponseDTO>addFavorite(@Valid @RequestBody FavoriteResponseDTO dto){
+        log.info("Request received to add product (ID: {}) to favorites for user (ID: {})", dto.getProductId(), dto.getUserId());
+
         Favorite favorite = favoriteService.toFavoriteEntity(dto);
         Favorite saved = favoriteService.addFavorite(favorite);
         FavoriteResponseDTO responseDTO = favoriteService.toFavoriteResponseDTO(saved);
+
+        log.info("Product (ID: {}) successfully added to favorites for user (ID: {})", dto.getProductId(), dto.getUserId());
         return ResponseEntity.ok(responseDTO);
     }
 

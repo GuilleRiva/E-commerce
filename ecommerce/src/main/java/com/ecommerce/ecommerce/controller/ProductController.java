@@ -106,7 +106,12 @@ public class ProductController {
     @PreAuthorize("hasROLE('ADMIN')")
     @PostMapping
     public ResponseEntity<Products>createProduct(@Valid @RequestBody ProductResponseDTO dto){
+        log.info("Received request to create product: Name={}, Price={},Stock={}",
+                dto.getName(), dto.getPrice(), dto.getStock());
+
         Products created= productService.saveProduct(dto);
+        log.info("Product created successfully with ID: {}", created.getId());
+
         return ResponseEntity.ok(created);
     }
 
