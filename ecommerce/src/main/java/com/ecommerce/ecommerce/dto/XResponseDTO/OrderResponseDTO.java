@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.dto.XResponseDTO;
 
+import com.ecommerce.ecommerce.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,7 @@ public class OrderResponseDTO {
     private LocalDateTime createdAt;
     private BigDecimal total;
     private List<OrderItemDTO> items;
+
+    public OrderResponseDTO(Long id, Long id1, List<OrderItemDTO> items, BigDecimal total, OrderStatus orderStatus, LocalDateTime createdAt) {
+    }
 }
